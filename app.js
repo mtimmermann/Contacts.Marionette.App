@@ -88,7 +88,7 @@ app.get('/contacts', function(req, res) {
                         message: 'Server error',
                         description: 'More details about the error here' }));
                 } else {
-                    return res.send(JSON.stringify(docs))
+                    return res.send(JSON.stringify({ data: docs }))
                 }
         });
     } else {

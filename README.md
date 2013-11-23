@@ -102,11 +102,14 @@ contactsmarionetteui -> /home/mark/Projects/Contacts.Marionette.UI/deploy/
 After NodeJS, MongoDB, and NGINX (or other) are installed...
 
 Install the project dependencies:
+
 npm install
 
 Initialize the Mongo DB, from the root of the project directory run:
+
 node config/initialize_db.js
 
 Run the app
+
 node app.js
 

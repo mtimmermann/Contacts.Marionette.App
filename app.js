@@ -72,36 +72,57 @@ var getCountFunctionDefered = function() {
 app.get('/contacts', function(req, res) {
     var page = getIntParam(req.query.page);
     var pageSize = getIntParam(req.query.pageSize)
+    var search = req.query.search;
 
-    $.when(getCountFunctionDefered()).done(function(nbDocs) {
+    if (search) {
+        db.contacts.find({'$or':[
+            {'firstName':{'$regex':search, '$options':'i'}},
+            {'lastName':{'$regex':search, '$options':'i'}}]},
+            function(error, docs) {
+                if (error || !docs) {
+                    // TODO: Logging
+                    console.log(error);
+                    res.statusCode = 500;
+                    return res.send(JSON.stringify({
+                        code: res.statusCode,
+                        message: 'Server error',
+                        description: 'More details about the error here' }));
+                } else {
+                    return res.send(JSON.stringify(docs))
+                }
+        });
+    } else {
 
-        var sortBy = req.query.sort_by ? req.query.sort_by : 'lastName';
-        var argOrder = req.query.order ? req.query.order : 'asc';
-        var sortOrder = argOrder === 'desc' ? -1 : 1;
-        var sortObj = {};
-        sortObj[sortBy] = sortOrder;
+        $.when(getCountFunctionDefered()).done(function(nbDocs) {
 
-        if (page && pageSize) {
-            var top = (page -1) * pageSize;
-            var start = top - pageSize;
-            if (start < nbDocs) {
+            var sortBy = req.query.sort_by ? req.query.sort_by : 'lastName';
+            var argOrder = req.query.order ? req.query.order : 'asc';
+            var sortOrder = argOrder === 'desc' ? -1 : 1;
+            var sortObj = {};
+            sortObj[sortBy] = sortOrder;
 
-                // TODO: Determine how to ingore case with sort
-                return db.contacts.find().sort(sortObj).skip((page-1) * pageSize).limit(pageSize, function(err, docs) {
-                    //res.json({ totalRecords: nbDocs, page: page, data: docs });
-                    res.send(JSON.stringify({ totalRecords: nbDocs, page: page, data: docs }));
+            if (page && pageSize) {
+                var top = (page -1) * pageSize;
+                var start = top - pageSize;
+                if (start < nbDocs) {
+
+                    // TODO: Determine how to ingore case with sort
+                    return db.contacts.find().sort(sortObj).skip((page-1) * pageSize).limit(pageSize, function(err, docs) {
+                        //res.json({ totalRecords: nbDocs, page: page, data: docs });
+                        res.send(JSON.stringify({ totalRecords: nbDocs, page: page, data: docs }));
+                    });
+                }
+
+                //return res.json({ totalRecords: nbDocs, page: page, data: [] });
+                return res.send(JSON.stringify({ totalRecords: nbDocs, page: page, data: [] }));
+            } else {
+                return db.contacts.find().sort(sortObj, function(err, docs) {
+                    //res.json({ totalRecords: nbDocs, data: docs });
+                    res.send(JSON.stringify({ totalRecords: nbDocs, data: docs }));
                 });
             }
-
-            //return res.json({ totalRecords: nbDocs, page: page, data: [] });
-            return res.send(JSON.stringify({ totalRecords: nbDocs, page: page, data: [] }));
-        } else {
-            return db.contacts.find().sort(sortObj, function(err, docs) {
-                //res.json({ totalRecords: nbDocs, data: docs });
-                res.send(JSON.stringify({ totalRecords: nbDocs, data: docs }));
-            });
-        }
-    });
+        });
+    }
 });
 
 

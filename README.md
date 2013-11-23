@@ -14,6 +14,9 @@ I am also using NGINX to serve up the static content the of the [Contacts.Marion
 
 
 ## Configuration ##
+
+Below is the basic configuration I'm using...
+
 The nginx.conf file used for this project:
 ```
 worker_processes  1;
@@ -80,8 +83,30 @@ http {
 }
 ```
 
+If installing NGINX, I've created a bash script to retrieve and build NGINX(v.1.5.6) located at /config/  run at your own risk (and always investigate a script, program, etc... before running).
 
 
+/etc/hosts
+```
+127.0.0.1   contacts.marionette.dev
+```
+
+Symlinks in /opt/mark/www/ :
+```
+contactsmarionettepics -> /home/mark/Projects/Contacts.Marionette.App/pics/
+contactsmarionetteui -> /home/mark/Projects/Contacts.Marionette.UI/deploy/
+```
+
+
+## Setup ##
+After NodeJS, MongoDB, and NGINX (or other) are installed...
+
+Install the project dependencies:
 npm install
 
+Initialize the Mongo DB, from the root of the project directory run:
+node config/initialize_db.js
+
+Run the app
+node app.js
 

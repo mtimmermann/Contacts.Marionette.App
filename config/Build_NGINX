@@ -1,0 +1,27 @@
+#!/bin/sh
+
+cd ~
+mkdir -p src
+cd src
+
+# http://mdounin.ru/hg/ngx_http_auth_request_module
+wget -O ngx_http_auth_request_module.tar.gz  http://mdounin.ru/hg/ngx_http_auth_request_module/archive/tip.tar.gz
+tar -zxvf ngx_http_auth_request_module.tar.gz
+rm ngx_http_auth_request_module.tar.gz
+
+# http://wiki.nginx.org/NginxHttpHeadersMoreModule#Installation
+wget -O headers-more-nginx-module.tar.gz https://github.com/agentzh/headers-more-nginx-module/archive/v0.22.tar.gz
+tar -zxvf headers-more-nginx-module.tar.gz
+rm headers-more-nginx-module.tar.gz 
+
+wget http://nginx.org/download/nginx-1.5.6.tar.gz
+tar -zxvf nginx-1.5.6.tar.gz
+rm nginx-1.5.6.tar.gz
+
+cd nginx-1.5.6
+./configure --with-http_ssl_module --add-module=../headers-more-nginx-module-0.22 --add-module=../ngx_http_auth_request_module-662785733552
+
+make
+sudo make install
+
+
